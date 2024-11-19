@@ -1,0 +1,30 @@
+.
+├── build
+├── config
+│   ├── jest
+│   └── webpack
+│       └── persistentCache
+├── package.json
+├── package-lock.json
+├── postcss.config.js
+├── public
+│   ├── hr-ratio-report.html
+│   └── index.html
+├── README.md
+├── scripts
+├── src
+│   ├── App.js
+│   ├── ExpenseAnalysis.tsx
+│   ├── HRActivitiesAnalysis.tsx
+│   ├── HRDashboard.jsx
+│   ├── HRProcessCoverage.jsx
+│   ├── HRRatioAnalysis.jsx
+│   ├── HRTeamEffort.jsx
+│   ├── index.js
+│   ├── RecruitingAnalysis.tsx
+│   ├── styles.css
+│   └── UI.jsx
+├── struttura.txt
+└── tailwind.config.js
+
+8 directories, 19 files

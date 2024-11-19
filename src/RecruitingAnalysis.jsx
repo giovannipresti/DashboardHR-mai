@@ -1,16 +1,10 @@
 import React from "react";
+import { Card } from "./UI";
 import { Users, TrendingUp, AlertTriangle } from "lucide-react";
 
-interface MetricCardProps {
-  label: string;
-  current: string;
-  target: string;
-  gap: string;
-}
-
-function MetricCard({ label, current, target, gap }: MetricCardProps) {
+const MetricCard = ({ label, current, target, gap }) => {
   return (
-    <div className="bg-white shadow rounded p-4">
+    <Card>
       <div className="flex justify-between items-center mb-2">
         <h3 className="font-medium text-gray-900">{label}</h3>
         <AlertTriangle className="w-5 h-5 text-amber-500" />
@@ -29,11 +23,11 @@ function MetricCard({ label, current, target, gap }: MetricCardProps) {
           <span className="text-red-600">{gap}</span>
         </div>
       </div>
-    </div>
+    </Card>
   );
-}
+};
 
-export default function RecruitingAnalysis() {
+const RecruitingAnalysis = () => {
   const metrics = [
     {
       label: "Posizioni/Anno",
@@ -56,7 +50,7 @@ export default function RecruitingAnalysis() {
   ];
 
   return (
-    <div>
+    <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900">Recruiting Analysis</h2>
         <div className="flex items-center space-x-2">
@@ -66,10 +60,12 @@ export default function RecruitingAnalysis() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {metrics.map((metric, index) => (
-          <MetricCard key={index} {...metric} />
+        {metrics.map((metric) => (
+          <MetricCard key={metric.label} {...metric} />
         ))}
       </div>
     </div>
   );
-}
+};
+
+export default RecruitingAnalysis;
