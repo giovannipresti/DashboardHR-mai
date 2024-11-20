@@ -1,355 +1,145 @@
-import React from "react";
+import React, { useState } from "react";
+import { Users, Clock, AlertTriangle } from "lucide-react";
 import { Card } from "./UI";
-import {
-  Users,
-  Brain,
-  Target,
-  Settings,
-  DollarSign,
-  Briefcase,
-  UserPlus,
-  GitBranch,
-} from "lucide-react";
+import TeamMemberCard from "./TeamMemberCard";
+import { initialTeamMembers, organizationData, categories } from "./teamData";
 
 const HRTeamEffort = () => {
-  const hoursToFTE = (hours) => (hours / 143).toFixed(2);
+  const [teamMembers, setTeamMembers] = useState(initialTeamMembers);
 
-  const teamMembers = [
-    {
-      role: "Head of HR",
-      name: "Presti",
-      focusAreas: [
-        "Direzione strategica",
-        "Gestione team",
-        "Relazioni corporate",
-      ],
-      icon: <Briefcase className="w-6 h-6 text-blue-600" />,
-      activities: [
-        {
-          name: "Strategic Planning",
-          hours: 57,
-          category: "Strategic",
-        },
-        {
-          name: "Team Management",
-          hours: 43,
-          category: "Management",
-        },
-        {
-          name: "Corporate Relations",
-          hours: 43,
-          category: "Strategic",
-        },
-      ],
-      fteCap: 1.0,
-    },
-    {
-      role: "HR Business Partner",
-      name: "Pizzinato",
-      focusAreas: ["Recruiting senior", "People partnership Emilia Romagna"],
-      icon: <Target className="w-6 h-6 text-blue-600" />,
-      activities: [
-        {
-          name: "Senior Recruiting",
-          hours: 86,
-          category: "Recruiting",
-        },
-        {
-          name: "People Partnership",
-          hours: 57,
-          category: "Strategic",
-        },
-      ],
-      fteCap: 1.0,
-    },
-    {
-      role: "HR Specialist",
-      name: "Borella",
-      focusAreas: [
-        "Training Management",
-        "Procedure amministrative",
-        "Immigration",
-        "Onboarding Torino",
-      ],
-      icon: <Brain className="w-6 h-6 text-blue-600" />,
-      activities: [
-        {
-          name: "Training Management",
-          hours: 57,
-          category: "Development",
-        },
-        {
-          name: "Immigration & Admin",
-          hours: 29,
-          category: "Admin",
-        },
-        {
-          name: "Procedure Admin",
-          hours: 29,
-          category: "Admin",
-        },
-        {
-          name: "Onboarding",
-          hours: 29,
-          category: "Operations",
-        },
-      ],
-      fteCap: 1.0,
-    },
-    {
-      role: "Labour Cost Specialist",
-      name: "Ramondetti",
-      focusAreas: [
-        "Gestione costo del lavoro",
-        "MBO e compensation",
-        "Reporting HR",
-        "Gestione SAP",
-      ],
-      icon: <DollarSign className="w-6 h-6 text-blue-600" />,
-      activities: [
-        {
-          name: "Labor Cost Management",
-          hours: 57,
-          category: "Admin",
-        },
-        {
-          name: "Compensation & MBO",
-          hours: 43,
-          category: "Strategic",
-        },
-        {
-          name: "HR Reporting & SAP",
-          hours: 29,
-          category: "Operations",
-        },
-        {
-          name: "SAP Management",
-          hours: 14,
-          category: "Operations",
-        },
-      ],
-      fteCap: 1.0,
-    },
-    {
-      role: "Payroll Specialist",
-      name: "Gadaleta",
-      focusAreas: ["Amministrazione personale", "Gestione payroll", "Benefits"],
-      icon: <Settings className="w-6 h-6 text-blue-600" />,
-      activities: [
-        {
-          name: "Payroll Management",
-          hours: 72,
-          category: "Admin",
-        },
-        {
-          name: "Personnel Admin",
-          hours: 43,
-          category: "Admin",
-        },
-        {
-          name: "Benefits Administration",
-          hours: 29,
-          category: "Admin",
-        },
-      ],
-      fteCap: 1.0,
-    },
-    {
-      role: "HR Professional EOL",
-      name: "Labarile",
-      focusAreas: [
-        "Full-cycle HR per EOL",
-        "Recruiting e onboarding",
-        "Training ed operations",
-      ],
-      icon: <Users className="w-6 h-6 text-blue-600" />,
-      activities: [
-        {
-          name: "EOL Recruiting & Onboarding",
-          hours: 57,
-          category: "Recruiting",
-        },
-        {
-          name: "EOL Training",
-          hours: 43,
-          category: "Development",
-        },
-        {
-          name: "EOL HR Operations",
-          hours: 43,
-          category: "Operations",
-        },
-      ],
-      fteCap: 1.0,
-    },
-    {
-      role: "Recruiter",
-      name: "Beliunaite",
-      focusAreas: ["Recruiting junior/middle", "Supporto onboarding"],
-      icon: <UserPlus className="w-6 h-6 text-blue-600" />,
-      activities: [
-        {
-          name: "Junior/Middle Recruiting",
-          hours: 100,
-          category: "Recruiting",
-        },
-        {
-          name: "Onboarding Support",
-          hours: 43,
-          category: "Operations",
-        },
-      ],
-      fteCap: 1.0,
-    },
-    {
-      role: "Flexibility & Contractors Manager",
-      name: "Luppi (50%)",
-      focusAreas: [
-        "Gestione flessibilità",
-        "Coordinamento contractor",
-        "Gestione fornitori engineering",
-      ],
-      icon: <GitBranch className="w-6 h-6 text-blue-600" />,
-      activities: [
-        {
-          name: "Contractor Management",
-          hours: 29,
-          category: "Operations",
-        },
-        {
-          name: "Vendor Management",
-          hours: 21,
-          category: "Admin",
-        },
-        {
-          name: "Flexibility Management",
-          hours: 21,
-          category: "Operations",
-        },
-      ],
-      fteCap: 0.5,
-    },
-  ];
+  const handleFTEChange = (memberIndex, activityIndex, newFTE) => {
+    const updatedMembers = [...teamMembers];
+    const member = updatedMembers[memberIndex];
+
+    const totalOtherFTE = member.activities.reduce(
+      (sum, act, idx) => (idx === activityIndex ? sum : sum + act.fte),
+      0
+    );
+
+    const maxAllowedFTE = member.fteCap - totalOtherFTE;
+    const adjustedFTE = Math.min(Math.max(0, newFTE), maxAllowedFTE);
+
+    member.activities[activityIndex].fte = adjustedFTE;
+    setTeamMembers(updatedMembers);
+  };
+
+  const calculateTotalTeamFTE = () => {
+    return teamMembers
+      .reduce(
+        (sum, member) =>
+          sum +
+          member.activities.reduce(
+            (memberSum, activity) => memberSum + activity.fte,
+            0
+          ),
+        0
+      )
+      .toFixed(2);
+  };
 
   const calculateCategoryTotals = () => {
-    const totals = {
-      Strategic: 0,
-      Recruiting: 0,
-      Development: 0,
-      Operations: 0,
-      Admin: 0,
-      Management: 0,
-    };
+    const totals = Object.keys(categories).reduce(
+      (acc, cat) => ({ ...acc, [cat]: 0 }),
+      {}
+    );
 
     teamMembers.forEach((member) => {
       member.activities.forEach((activity) => {
-        totals[activity.category] += activity.hours;
+        totals[activity.category] += activity.fte;
       });
     });
 
     return totals;
   };
 
+  const calculateRecruitingCapacity = () => {
+    let totalCapacity = 0;
+    teamMembers.forEach((member) => {
+      if (member.recruitingCapacity) {
+        totalCapacity +=
+          member.recruitingCapacity.positions ||
+          member.recruitingCapacity.seniorPositions;
+      }
+    });
+    return totalCapacity;
+  };
+
+  const categoryTotals = calculateCategoryTotals();
+  const currentRecruitingCapacity = calculateRecruitingCapacity();
+
   return (
     <div className="w-full space-y-6 p-6 bg-gray-50">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            AVL Italia HR Team Effort Analysis
+            HR Team Effort Allocation
           </h1>
-          <p className="text-sm text-gray-600 mt-2">Total FTE Available: 7.5</p>
+          <p className="text-sm text-gray-600 mt-2">
+            Organization: {organizationData.totalHeadcount} HC | Current Ratio:{" "}
+            {organizationData.hrRatio} | Benchmark: {organizationData.benchmark}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-lg font-bold text-blue-600">
+            {calculateTotalTeamFTE()} / 7.5 FTE
+          </p>
         </div>
       </div>
 
-      <Card className="shadow-lg">
-        <div className="p-6">
-          <h3 className="text-lg font-medium text-blue-700 mb-4">
-            Team Effort Distribution
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {Object.entries(calculateCategoryTotals()).map(
-              ([category, hours]) => (
-                <div key={category} className="p-4 bg-white rounded-lg border">
-                  <div className="text-sm text-gray-600">{category}</div>
-                  <div className="text-xl font-bold text-gray-900">
-                    {hoursToFTE(hours)} FTE
-                  </div>
-                  <div className="text-sm text-gray-500">{hours} hours</div>
-                </div>
-              )
-            )}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card className="bg-blue-50">
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-medium">Recruiting Capacity</h3>
+              <AlertTriangle
+                className={
+                  currentRecruitingCapacity <
+                  organizationData.recruitingNeeds.total
+                    ? "text-red-500"
+                    : "text-green-500"
+                }
+              />
+            </div>
+            <div className="space-y-1 text-sm">
+              <p>Current: {currentRecruitingCapacity} positions/year</p>
+              <p>
+                Required: {organizationData.recruitingNeeds.total}{" "}
+                positions/year
+              </p>
+              <p className="text-red-600">
+                Gap:{" "}
+                {currentRecruitingCapacity -
+                  organizationData.recruitingNeeds.total}{" "}
+                positions
+              </p>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {teamMembers.map((member) => (
-          <Card key={member.name} className="shadow-lg">
-            <div className="p-6">
-              <div className="flex flex-row items-center space-x-2">
-                {member.icon}
-                <div>
-                  <h3 className="text-lg font-medium text-blue-700">
-                    {member.role}
-                  </h3>
-                  <div className="text-sm text-gray-600">{member.name}</div>
-                </div>
+        {Object.entries(categoryTotals).map(([category, total]) => (
+          <Card key={category} className="bg-gray-50">
+            <div className="p-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: categories[category].color }}
+                />
+                <h3 className="font-medium">{category}</h3>
               </div>
-              <div className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-gray-700">
-                    Activities & Effort:
-                  </div>
-                  {member.activities.map((activity, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between text-sm"
-                    >
-                      <span className="text-gray-600">{activity.name}</span>
-                      <div className="text-right">
-                        <span className="font-medium">
-                          {hoursToFTE(activity.hours)} FTE
-                        </span>
-                        <span className="text-gray-500 text-xs ml-2">
-                          ({activity.hours}h)
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="pt-2 border-t">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Total Effort vs Cap:</span>
-                    <div>
-                      <span
-                        className={`font-medium ${
-                          hoursToFTE(
-                            member.activities.reduce(
-                              (acc, curr) => acc + curr.hours,
-                              0
-                            )
-                          ) > member.fteCap
-                            ? "text-red-600"
-                            : "text-green-600"
-                        }`}
-                      >
-                        {hoursToFTE(
-                          member.activities.reduce(
-                            (acc, curr) => acc + curr.hours,
-                            0
-                          )
-                        )}
-                      </span>
-                      <span className="text-gray-500 ml-1">
-                        / {member.fteCap} FTE
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <p className="text-2xl font-bold">{total.toFixed(2)} FTE</p>
             </div>
           </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        {teamMembers.map((member, memberIndex) => (
+          <TeamMemberCard
+            key={member.name}
+            member={member}
+            memberIndex={memberIndex}
+            onFTEChange={handleFTEChange}
+          />
         ))}
       </div>
     </div>
