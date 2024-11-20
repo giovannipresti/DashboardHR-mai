@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Card } from "./UI";
 import { AlertTriangle } from "lucide-react";
 
-const StaffingCalculator = ({ onStaffingChange }) => {
+const StaffingCalculator = ({ staffingData, onStaffingChange }) => {
   const [staffing, setStaffing] = useState({
     avlEmployees: 340,
     avlAgency: 50,
@@ -12,6 +12,19 @@ const StaffingCalculator = ({ onStaffingChange }) => {
     turnoverRate: 12,
     growthPositions: 20,
   });
+
+  useEffect(() => {
+    if (staffingData) {
+      setStaffing({
+        avlEmployees: staffingData.avlEmployees,
+        avlAgency: staffingData.avlAgency,
+        avlContractors: staffingData.avlContractors,
+        eolEmployees: staffingData.eolEmployees,
+        turnoverRate: 12,
+        growthPositions: staffingData.growthPositions,
+      });
+    }
+  }, [staffingData]);
 
   const totalEmployees =
     staffing.avlEmployees +
@@ -27,25 +40,41 @@ const StaffingCalculator = ({ onStaffingChange }) => {
     1720
   ).toFixed(2);
 
-  useEffect(() => {
-    onStaffingChange({
-      employees: totalEmployees,
-      turnoverPositions,
-      growthPositions: staffing.growthPositions,
-      totalPositions,
-      requiredRecruitingFTE,
-      avlEmployees: staffing.avlEmployees,
-      avlAgency: staffing.avlAgency,
-      avlContractors: staffing.avlContractors,
-      eolEmployees: staffing.eolEmployees,
-    });
-  }, [staffing]);
-
   const handleChange = (field) => (e) => {
-    setStaffing((prev) => ({
-      ...prev,
+    const newStaffing = {
+      ...staffing,
       [field]: Number(e.target.value),
-    }));
+    };
+    setStaffing(newStaffing);
+
+    const updatedTotalEmployees =
+      newStaffing.avlEmployees +
+      newStaffing.avlAgency +
+      newStaffing.avlContractors +
+      newStaffing.eolEmployees;
+    const updatedTurnoverPositions = Math.round(
+      (updatedTotalEmployees * newStaffing.turnoverRate) / 100
+    );
+    const updatedTotalPositions =
+      updatedTurnoverPositions + newStaffing.growthPositions;
+    const updatedRecruitingFTE = (
+      (updatedTotalPositions * 40 * 0.4 + updatedTotalPositions * 26 * 0.6) /
+      1720
+    ).toFixed(2);
+
+    const updatedData = {
+      employees: updatedTotalEmployees,
+      turnoverPositions: updatedTurnoverPositions,
+      growthPositions: newStaffing.growthPositions,
+      totalPositions: updatedTotalPositions,
+      requiredRecruitingFTE: updatedRecruitingFTE,
+      avlEmployees: newStaffing.avlEmployees,
+      avlAgency: newStaffing.avlAgency,
+      avlContractors: newStaffing.avlContractors,
+      eolEmployees: newStaffing.eolEmployees,
+    };
+
+    onStaffingChange(updatedData);
   };
 
   return (

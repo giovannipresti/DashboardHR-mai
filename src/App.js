@@ -7,10 +7,7 @@ import HRActivitiesAnalysis from "./HRActivitiesAnalysis";
 import ExpenseAnalysis from "./ExpenseAnalysis";
 import HRTeamEffort from "./HRTeamEffort";
 import HRProcessCoverage from "./HRProcessCoverage";
-import {
-  ProcessConfigProvider,
-  useProcessConfig,
-} from "./ProcessConfigContext";
+import { ProcessConfigProvider } from "./ProcessConfigContext";
 import { generateProcessData } from "./processData";
 
 const MainContent = () => {
@@ -27,8 +24,12 @@ const MainContent = () => {
     eolEmployees: 35,
   });
 
-  const { config } = useProcessConfig();
-  const processes = generateProcessData(staffingData, config);
+  const processes = generateProcessData(staffingData);
+
+  const handleStaffingChange = (newData) => {
+    console.log("Updating staffing data:", newData); // Debug log
+    setStaffingData(newData);
+  };
 
   const navItems = [
     {
@@ -68,7 +69,7 @@ const MainContent = () => {
         return (
           <HRProcessCoverage
             staffingData={staffingData}
-            onStaffingChange={setStaffingData}
+            onStaffingChange={handleStaffingChange}
           />
         );
       case "team-effort":
@@ -89,7 +90,6 @@ const MainContent = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex">
-        {/* Sidebar */}
         <div className="w-64 min-h-screen bg-white shadow-lg p-6">
           <h1 className="text-xl font-bold text-blue-700 mb-8">HR Analysis</h1>
           <nav className="space-y-2">
@@ -109,8 +109,6 @@ const MainContent = () => {
             ))}
           </nav>
         </div>
-
-        {/* Main Content */}
         <div className="flex-1 h-screen overflow-auto">{renderView()}</div>
       </div>
     </div>

@@ -1,24 +1,13 @@
 // HRProcessCoverage.jsx
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Calculator } from "lucide-react";
 import StaffingCalculator from "./StaffingCalculator";
 import ProcessDetail from "./ProcessDetail";
 import SummaryMetrics from "./SummaryMetrics";
 import { generateProcessData } from "./processData";
-import {
-  ProcessConfigProvider,
-  useProcessConfig,
-} from "./ProcessConfigContext";
+import { useProcessConfig } from "./ProcessConfigContext";
 
-const HRProcessCoverageContent = () => {
-  const [staffingData, setStaffingData] = useState({
-    employees: 475,
-    turnoverPositions: 57,
-    growthPositions: 20,
-    totalPositions: 77,
-    requiredRecruitingFTE: 3.2,
-  });
-
+const HRProcessCoverage = ({ staffingData, onStaffingChange }) => {
   const { config } = useProcessConfig();
   const processes = generateProcessData(staffingData, config);
 
@@ -37,7 +26,10 @@ const HRProcessCoverageContent = () => {
         </div>
       </div>
 
-      <StaffingCalculator onStaffingChange={setStaffingData} />
+      <StaffingCalculator
+        staffingData={staffingData}
+        onStaffingChange={onStaffingChange}
+      />
 
       {processes.map((process) => (
         <ProcessDetail key={process.name} process={process} />
@@ -47,11 +39,5 @@ const HRProcessCoverageContent = () => {
     </div>
   );
 };
-
-const HRProcessCoverage = () => (
-  <ProcessConfigProvider>
-    <HRProcessCoverageContent />
-  </ProcessConfigProvider>
-);
 
 export default HRProcessCoverage;
