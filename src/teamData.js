@@ -13,7 +13,7 @@ import React from "react";
 export const categories = {
   Strategic: { label: "Strategic", color: "#60A5FA" },
   Recruiting: { label: "Recruiting", color: "#34D399" },
-  Development: { label: "Development", color: "#F59E0B" },
+  PeopleDev: { label: "People Development", color: "#F59E0B" },
   Operations: { label: "Operations", color: "#8B5CF6" },
   Admin: { label: "Admin", color: "#EC4899" },
   Management: { label: "Management", color: "#6366F1" },
@@ -89,7 +89,7 @@ export const initialTeamMembers = [
     activities: [
       {
         name: "Training Management",
-        category: "Development",
+        category: "PeopleDev",
         fte: 0.4,
         hoursPerMonth: 57,
       },
@@ -197,7 +197,7 @@ export const initialTeamMembers = [
       },
       {
         name: "EOL Training",
-        category: "Development",
+        category: "PeopleDev",
         fte: 0.3,
         hoursPerMonth: 43,
       },

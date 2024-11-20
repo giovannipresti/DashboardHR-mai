@@ -23,6 +23,26 @@ const HRTeamEffort = () => {
     setTeamMembers(updatedMembers);
   };
 
+  const handleAddActivity = (memberIndex, newActivity) => {
+    const updatedMembers = [...teamMembers];
+    updatedMembers[memberIndex] = {
+      ...updatedMembers[memberIndex],
+      activities: [...updatedMembers[memberIndex].activities, newActivity],
+    };
+    setTeamMembers(updatedMembers);
+  };
+
+  const handleRemoveActivity = (memberIndex, activityIndex) => {
+    const updatedMembers = [...teamMembers];
+    updatedMembers[memberIndex] = {
+      ...updatedMembers[memberIndex],
+      activities: updatedMembers[memberIndex].activities.filter(
+        (_, idx) => idx !== activityIndex
+      ),
+    };
+    setTeamMembers(updatedMembers);
+  };
+
   const calculateTotalTeamFTE = () => {
     return teamMembers
       .reduce(
@@ -139,6 +159,8 @@ const HRTeamEffort = () => {
             member={member}
             memberIndex={memberIndex}
             onFTEChange={handleFTEChange}
+            onAddActivity={handleAddActivity}
+            onRemoveActivity={handleRemoveActivity}
           />
         ))}
       </div>
