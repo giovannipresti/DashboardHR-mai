@@ -3,12 +3,9 @@ import React, { useState } from "react";
 import { Card } from "./UI";
 import { Settings } from "lucide-react";
 import DetailModal from "./DetailModal";
-import { useProcessConfig } from "./ProcessConfigContext";
 
 const ProcessDetail = ({ process }) => {
   const [showModal, setShowModal] = useState(false);
-  const { updateConfig } = useProcessConfig();
-
   const calculateTotalFTE = (subProcesses) => {
     return subProcesses.reduce((acc, curr) => acc + curr.fte, 0);
   };
@@ -106,7 +103,6 @@ const ProcessDetail = ({ process }) => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         process={process}
-        onUpdateConfig={updateConfig}
       />
     </>
   );

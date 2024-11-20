@@ -1,14 +1,34 @@
-import React from "react";
+// App.js
+import React, { useState } from "react";
+import { Users, Brain, Target, Clock, FileText } from "lucide-react";
 import HRDashboard from "./HRDashboard";
 import RecruitingAnalysis from "./RecruitingAnalysis";
 import HRActivitiesAnalysis from "./HRActivitiesAnalysis";
 import ExpenseAnalysis from "./ExpenseAnalysis";
 import HRTeamEffort from "./HRTeamEffort";
 import HRProcessCoverage from "./HRProcessCoverage";
-import { Users, Brain, Target, Clock, FileText } from "lucide-react";
+import {
+  ProcessConfigProvider,
+  useProcessConfig,
+} from "./ProcessConfigContext";
+import { generateProcessData } from "./processData";
 
-function App() {
-  const [currentView, setCurrentView] = React.useState("dashboard");
+const MainContent = () => {
+  const [currentView, setCurrentView] = useState("dashboard");
+  const [staffingData, setStaffingData] = useState({
+    employees: 475,
+    turnoverPositions: 57,
+    growthPositions: 20,
+    totalPositions: 77,
+    requiredRecruitingFTE: 3.2,
+    avlEmployees: 340,
+    avlAgency: 50,
+    avlContractors: 50,
+    eolEmployees: 35,
+  });
+
+  const { config } = useProcessConfig();
+  const processes = generateProcessData(staffingData, config);
 
   const navItems = [
     {
@@ -32,7 +52,7 @@ function App() {
       icon: <Brain className="w-4 h-4" />,
     },
     {
-      id: "HRActivitiesAnalysis",
+      id: "expense",
       label: "Expense Analysis",
       icon: <FileText className="w-4 h-4" />,
     },
@@ -41,17 +61,28 @@ function App() {
   const renderView = () => {
     switch (currentView) {
       case "dashboard":
-        return <HRDashboard />;
+        return (
+          <HRDashboard staffingData={staffingData} processes={processes} />
+        );
       case "process-coverage":
-        return <HRProcessCoverage />;
+        return (
+          <HRProcessCoverage
+            staffingData={staffingData}
+            onStaffingChange={setStaffingData}
+          />
+        );
       case "team-effort":
-        return <HRTeamEffort />;
+        return (
+          <HRTeamEffort staffingData={staffingData} processes={processes} />
+        );
       case "recruiting":
-        return <RecruitingAnalysis />;
-      case "HRActivitiesAnalysis":
-        return <ExpenseAnalysis />;
+        return <RecruitingAnalysis staffingData={staffingData} />;
+      case "expense":
+        return <ExpenseAnalysis staffingData={staffingData} />;
       default:
-        return <HRDashboard />;
+        return (
+          <HRDashboard staffingData={staffingData} processes={processes} />
+        );
     }
   };
 
@@ -84,6 +115,12 @@ function App() {
       </div>
     </div>
   );
-}
+};
+
+const App = () => (
+  <ProcessConfigProvider>
+    <MainContent />
+  </ProcessConfigProvider>
+);
 
 export default App;
