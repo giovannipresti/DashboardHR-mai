@@ -63,7 +63,11 @@ const MainContent = () => {
     switch (currentView) {
       case "dashboard":
         return (
-          <HRDashboard staffingData={staffingData} processes={processes} />
+          <HRDashboard 
+            staffingData={staffingData} 
+            processes={processes}
+            onStaffingChange={handleStaffingChange}
+          />
         );
       case "process-coverage":
         return (
@@ -73,9 +77,7 @@ const MainContent = () => {
           />
         );
       case "team-effort":
-        return (
-          <HRTeamEffort staffingData={staffingData} processes={processes} />
-        );
+        return <HRTeamEffort staffingData={staffingData} processes={processes} />;
       case "recruiting":
         return <RecruitingAnalysis staffingData={staffingData} />;
       case "expense":

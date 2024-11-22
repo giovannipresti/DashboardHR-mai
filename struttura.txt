@@ -1,30 +1,50 @@
 .
+├── .DS_Store
+├── .codesandbox
+│   └── tasks.json
+├── .eslintrc.json
+├── .gitignore
+├── .vscode
+│   ├── launch.json
+│   └── settings.json
+├── README.md
 ├── build
-├── config
-│   ├── jest
-│   └── webpack
-│       └── persistentCache
+│   ├── asset-manifest.json
+│   ├── index.html
+│   └── static
+│       ├── css
+│       │   ├── main.44a772b4.css
+│       │   └── main.44a772b4.css.map
+│       └── js
+│           ├── main.8ad2b136.js
+│           ├── main.8ad2b136.js.LICENSE.txt
+│           └── main.8ad2b136.js.map
 ├── package.json
-├── package-lock.json
 ├── postcss.config.js
 ├── public
-│   ├── hr-ratio-report.html
 │   └── index.html
-├── README.md
-├── scripts
 ├── src
+│   ├── ActivitySlider.jsx
 │   ├── App.js
-│   ├── ExpenseAnalysis.tsx
-│   ├── HRActivitiesAnalysis.tsx
+│   ├── DetailModal.jsx
+│   ├── ExpenseAnalysis.jsx
+│   ├── HRActivitiesAnalysis.jsx
 │   ├── HRDashboard.jsx
 │   ├── HRProcessCoverage.jsx
-│   ├── HRRatioAnalysis.jsx
 │   ├── HRTeamEffort.jsx
+│   ├── ProcessConfigContext.js
+│   ├── ProcessDetail.jsx
+│   ├── RecruitingAnalysis.jsx
+│   ├── StaffingCalculator.jsx
+│   ├── SummaryMetrics.jsx
+│   ├── TeamMemberCard.jsx
+│   ├── UI.jsx
 │   ├── index.js
-│   ├── RecruitingAnalysis.tsx
+│   ├── processData.js
 │   ├── styles.css
-│   └── UI.jsx
+│   ├── teamData.js
+│   └── utils.js
 ├── struttura.txt
 └── tailwind.config.js
 
-8 directories, 19 files
+9 directories, 39 files

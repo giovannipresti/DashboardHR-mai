@@ -1,7 +1,6 @@
 // HRProcessCoverage.jsx
 import React from "react";
 import { Calculator } from "lucide-react";
-import StaffingCalculator from "./StaffingCalculator";
 import ProcessDetail from "./ProcessDetail";
 import SummaryMetrics from "./SummaryMetrics";
 import { generateProcessData } from "./processData";
@@ -25,11 +24,6 @@ const HRProcessCoverage = ({ staffingData, onStaffingChange }) => {
           </span>
         </div>
       </div>
-
-      <StaffingCalculator
-        staffingData={staffingData}
-        onStaffingChange={onStaffingChange}
-      />
 
       {processes.map((process) => (
         <ProcessDetail key={process.name} process={process} />
