@@ -1,39 +1,55 @@
 {
-  "name": "hr-dashboard",
+  "name": "hr-process-analysis",
   "version": "1.0.0",
-  "description": "HR Dashboard Analysis",
-  "keywords": [],
-  "main": "src/index.js",
+  "description": "HR Process Analysis and Capacity Planning Tool",
+  "private": true,
   "dependencies": {
-    "autoprefixer": "^10.4.16",
-    "lodash": "^4.17.21", 
-    "lucide-react": "0.263.1",
-    "papaparse": "^5.4.1",
-    "postcss": "^8.4.32",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-scripts": "5.0.1", 
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "lucide-react": "^0.263.1",
+    "lodash": "^4.17.21",
     "recharts": "^2.10.3",
-    "tailwindcss": "^3.3.0",
-    "typescript": "4.9.5"
+    "papaparse": "^5.4.1"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/lodash": "^4.14.202",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.0",
     "@craco/craco": "^7.1.0",
-    "@types/react": "18.2.0",
-    "@types/react-dom": "18.2.0"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "typescript": "^4.9.5"
   },
   "scripts": {
-    "prestart": "node scripts/kill-port.js",
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead", 
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "postcss": {
+    "plugins": {
+      "tailwindcss": {},
+      "autoprefixer": {}
+    }
+  }
 }
