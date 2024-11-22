@@ -12,22 +12,29 @@ import { generateProcessData } from "./processData";
 
 const MainContent = () => {
   const [currentView, setCurrentView] = useState("dashboard");
-  const [staffingData, setStaffingData] = useState({
-    employees: 475,
-    turnoverPositions: 57,
-    growthPositions: 20,
-    totalPositions: 77,
-    requiredRecruitingFTE: 3.2,
-    avlEmployees: 340,
-    avlAgency: 50,
-    avlContractors: 50,
-    eolEmployees: 35,
+  const [staffingData, setStaffingData] = useState(() => {
+    // Recupera i dati dal localStorage o usa i valori di default
+    const savedData = localStorage.getItem('staffingData');
+    return savedData ? JSON.parse(savedData) : {
+      employees: 475,
+      turnoverPositions: 57,
+      growthPositions: 20,
+      totalPositions: 77,
+      requiredRecruitingFTE: 3.2,
+      avlEmployees: 340,
+      avlAgency: 50,
+      avlContractors: 50,
+      eolEmployees: 35,
+      currentRecruitingCapacity: 45  // Added missing property
+    };
   });
 
   const processes = generateProcessData(staffingData);
 
   const handleStaffingChange = (newData) => {
     console.log("Updating staffing data:", newData); // Debug log
+    // Salva i dati nel localStorage
+    localStorage.setItem('staffingData', JSON.stringify(newData));
     setStaffingData(newData);
   };
 

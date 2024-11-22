@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Users, Clock, TrendingUp, Settings, Target } from 'lucide-react';
+import { calculateStaffingMetrics, defaultStaffingValues } from './utils/calculations';
 
 const StatCard = ({ title, value, Icon, description }) => (
   <div className="bg-white rounded-lg shadow-md p-4">
@@ -14,240 +15,152 @@ const StatCard = ({ title, value, Icon, description }) => (
   </div>
 );
 
-const HRDashboard = ({ staffingData, processes }) => {
-  const [staffing, setStaffing] = useState({
-    avlEmployees: 340,
-    avlAgency: 50,
-    avlContractors: 50,
-    eolEmployees: 35,
-    turnoverRate: 12,
-    growthPositions: 20,
+const HRDashboard = ({ onStaffingChange }) => {
+  const [staffing, setStaffing] = useState(() => {
+    const savedData = localStorage.getItem('staffingCalculator');
+    return savedData ? JSON.parse(savedData) : defaultStaffingValues;
   });
 
-  useEffect(() => {
-    if (staffingData) {
-      setStaffing({
-        avlEmployees: staffingData.avlEmployees,
-        avlAgency: staffingData.avlAgency,
-        avlContractors: staffingData.avlContractors,
-        eolEmployees: staffingData.eolEmployees,
-        turnoverRate: 12,
-        growthPositions: staffingData.growthPositions,
+  const metrics = calculateStaffingMetrics(staffing);
+
+  const handleChange = (field) => (e) => {
+    const newStaffing = {
+      ...staffing,
+      [field]: Number(e.target.value)
+    };
+    
+    const newMetrics = calculateStaffingMetrics(newStaffing);
+    
+    setStaffing(newStaffing);
+    localStorage.setItem('staffingCalculator', JSON.stringify(newStaffing));
+
+    if (onStaffingChange) {
+      onStaffingChange({
+        ...newStaffing,
+        ...newMetrics
       });
     }
-  }, [staffingData]);
+  };
 
-  const totalRequired = processes?.reduce((acc, p) => acc + p.required, 0) || 0;
-  const currentTotal = processes?.reduce((acc, p) => acc + p.current, 0) || 0;
-  const totalEmployees = staffing.avlEmployees + staffing.avlAgency + 
-    staffing.avlContractors + staffing.eolEmployees;
-  const currentRatio = Math.round(totalEmployees / currentTotal);
-  const targetRatio = Math.round(totalEmployees / totalRequired);
-
-  const stats = [
-    {
-      title: "Current FTE",
-      value: currentTotal.toFixed(1),
-      Icon: TrendingUp,
-      description: "Total HR team"
-    },
-    {
-      title: "Target FTE",
-      value: totalRequired.toFixed(1),
-      Icon: Users,
-      description: "Based on workload"
-    },
-    {
-      title: "Total HC",
-      value: totalEmployees,
-      Icon: Users,
-      description: "Total workforce"
-    },
-    {
-      title: "Current Ratio",
-      value: `1:${currentRatio}`,
-      Icon: Settings,
-      description: "HR:Employee ratio"
-    },
-    {
-      title: "Target Ratio",
-      value: `1:${targetRatio}`,
-      Icon: Target,
-      description: "Based on workload"
-    },
-    {
-      title: "Gap",
-      value: (totalRequired - currentTotal).toFixed(1),
-      Icon: Clock,
-      description: "Additional FTE needed"
+  const handleReset = () => {
+    setStaffing(defaultStaffingValues);
+    localStorage.setItem('staffingCalculator', JSON.stringify(defaultStaffingValues));
+    if (onStaffingChange) {
+      onStaffingChange({
+        ...defaultStaffingValues,
+        ...calculateStaffingMetrics(defaultStaffingValues)
+      });
     }
-  ];
-
-  // Staffing Calculator Section
-  const turnoverPositions = Math.round((totalEmployees * staffing.turnoverRate) / 100);
-  const totalPositions = turnoverPositions + staffing.growthPositions;
-  const requiredRecruitingFTE = ((totalPositions * 40 * 0.4 + totalPositions * 26 * 0.6) / 1720).toFixed(2);
+  };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">HR Transformation Overview</h1>
-      
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        {stats.map((stat, index) => (
-          <StatCard key={index} {...stat} />
-        ))}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-lg font-medium text-gray-900">Staffing Calculator</h2>
+        <button
+          onClick={handleReset}
+          className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>Reset to Default</span>
+        </button>
       </div>
 
-      {/* Staffing Calculator */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Staffing Calculator</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                AVL Employees
-              </label>
-              <input
-                type="number"
-                value={staffing.avlEmployees}
-                onChange={(e) => setStaffing({...staffing, avlEmployees: Number(e.target.value)})}
-                className="w-full border rounded-md px-3 py-2"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                AVL Agency Workers
-              </label>
-              <input
-                type="number"
-                value={staffing.avlAgency}
-                onChange={(e) => setStaffing({...staffing, avlAgency: Number(e.target.value)})}
-                className="w-full border rounded-md px-3 py-2"
-              />
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              AVL Employees
+            </label>
+            <input
+              type="number"
+              value={staffing.avlEmployees}
+              onChange={handleChange("avlEmployees")}
+              className="w-full border rounded-md px-3 py-2"
+            />
           </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                AVL Contractors
-              </label>
-              <input
-                type="number"
-                value={staffing.avlContractors}
-                onChange={(e) => setStaffing({...staffing, avlContractors: Number(e.target.value)})}
-                className="w-full border rounded-md px-3 py-2"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                EOL Employees
-              </label>
-              <input
-                type="number"
-                value={staffing.eolEmployees}
-                onChange={(e) => setStaffing({...staffing, eolEmployees: Number(e.target.value)})}
-                className="w-full border rounded-md px-3 py-2"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Turnover Rate (%)
-              </label>
-              <input
-                type="number"
-                value={staffing.turnoverRate}
-                onChange={(e) => setStaffing({...staffing, turnoverRate: Number(e.target.value)})}
-                className="w-full border rounded-md px-3 py-2"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Growth Positions
-              </label>
-              <input
-                type="number"
-                value={staffing.growthPositions}
-                onChange={(e) => setStaffing({...staffing, growthPositions: Number(e.target.value)})}
-                className="w-full border rounded-md px-3 py-2"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              AVL Agency Workers
+            </label>
+            <input
+              type="number"
+              value={staffing.avlAgency}
+              onChange={handleChange("avlAgency")}
+              className="w-full border rounded-md px-3 py-2"
+            />
           </div>
         </div>
 
-        {/* Calculator Results */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-sm text-gray-600">Total HC</div>
-            <div className="text-xl font-bold text-blue-700">{totalEmployees}</div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              AVL Contractors
+            </label>
+            <input
+              type="number"
+              value={staffing.avlContractors}
+              onChange={handleChange("avlContractors")}
+              className="w-full border rounded-md px-3 py-2"
+            />
           </div>
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-sm text-gray-600">Turnover Positions</div>
-            <div className="text-xl font-bold text-blue-700">{turnoverPositions}</div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              EOL Employees
+            </label>
+            <input
+              type="number"
+              value={staffing.eolEmployees}
+              onChange={handleChange("eolEmployees")}
+              className="w-full border rounded-md px-3 py-2"
+            />
           </div>
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-sm text-gray-600">Growth Positions</div>
-            <div className="text-xl font-bold text-blue-700">{staffing.growthPositions}</div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Turnover Rate (%)
+            </label>
+            <input
+              type="number"
+              value={staffing.turnoverRate}
+              onChange={handleChange("turnoverRate")}
+              className="w-full border rounded-md px-3 py-2"
+            />
           </div>
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-sm text-gray-600">Required Recruiting FTE</div>
-            <div className="text-xl font-bold text-blue-700">{requiredRecruitingFTE}</div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Growth Positions
+            </label>
+            <input
+              type="number"
+              value={staffing.growthPositions}
+              onChange={handleChange("growthPositions")}
+              className="w-full border rounded-md px-3 py-2"
+            />
           </div>
         </div>
       </div>
 
-      {/* Additional Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <h3 className="font-medium mb-4">Workforce Breakdown</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm">AVL Employees</span>
-              <span className="font-medium">{staffing.avlEmployees}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm">AVL Agency</span>
-              <span className="font-medium">{staffing.avlAgency}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm">AVL Contractors</span>
-              <span className="font-medium">{staffing.avlContractors}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm">EOL Employees</span>
-              <span className="font-medium">{staffing.eolEmployees}</span>
-            </div>
-            <div className="flex justify-between items-center pt-2 border-t">
-              <span className="text-sm font-medium">Total Workforce</span>
-              <span className="font-medium">{totalEmployees}</span>
-            </div>
-          </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p className="text-sm text-gray-600">Total HC</p>
+          <p className="text-xl font-bold text-blue-700">{metrics.totalEmployees}</p>
         </div>
-
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <h3 className="font-medium mb-4">Recruiting Overview</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm">Total Positions</span>
-              <span className="font-medium">{totalPositions}/year</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm">Turnover Positions</span>
-              <span className="font-medium">{turnoverPositions}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm">Growth Positions</span>
-              <span className="font-medium">{staffing.growthPositions}</span>
-            </div>
-            <div className="flex justify-between pt-2 border-t">
-              <span className="text-sm">Required Recruiting FTE</span>
-              <span className="font-medium text-blue-600">{requiredRecruitingFTE}</span>
-            </div>
-          </div>
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p className="text-sm text-gray-600">Turnover Positions</p>
+          <p className="text-xl font-bold text-blue-700">{metrics.turnoverPositions}</p>
+        </div>
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p className="text-sm text-gray-600">Total Positions</p>
+          <p className="text-xl font-bold text-blue-700">{metrics.totalPositions}</p>
+        </div>
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p className="text-sm text-gray-600">Required Recruiting FTE</p>
+          <p className="text-xl font-bold text-blue-700">{metrics.requiredRecruitingFTE}</p>
         </div>
       </div>
     </div>

@@ -1,13 +1,15 @@
 // ProcessDetail.jsx
 import React from "react";
 import { Card } from "./UI";
-import { Users, Settings, Briefcase, GitBranch } from "lucide-react";
+import { Users, Settings, Briefcase, GitBranch, Brain, Target } from "lucide-react";
 
 const icons = {
   Users: Users,
   Settings: Settings,
   Briefcase: Briefcase,
   GitBranch: GitBranch,
+  Brain: Brain,
+  Target: Target
 };
 
 const ProcessDetail = ({ process }) => {
