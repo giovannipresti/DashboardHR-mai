@@ -1,29 +1,35 @@
 {
-    // These tasks will run in order when initializing your CodeSandbox project.
-    "setupTasks": [
-      {
-        "name": "Install Dependencies",
-        "command": "npm install"
-      }
-    ],
-  
-    // These tasks can be run from CodeSandbox. Running one will open a log in the app.
-    "tasks": {
-      "start": {
-        "name": "start",
-        "command": "npm start",
-        "runAtStart": true,
-        "preview": {
-          "port": 3000
-        }
-      },
-      "build": {
-        "name": "build",
-        "command": "npm run build",
-        "runAtStart": false
+  "setupTasks": [
+    {
+      "name": "Kill process on port 3000",
+      "command": "lsof -ti:3000 | xargs kill -9 || true" 
+    },
+    {
+      "name": "Install Dependencies", 
+      "command": "npm install"
+    }
+  ],
+  "tasks": {
+    "start": {
+      "name": "start",
+      "command": "lsof -ti:3000 | xargs kill -9 || true && npm start",
+      "runAtStart": true,
+      "preview": {
+        "port": 3000
       }
     },
-    "configurations": [
-    
-    ]
-  }
+    "build": {
+      "name": "build",
+      "command": "npm run build",
+      "runAtStart": false
+    }
+  },
+  "configurations": [
+    {
+      "command": "npm start",
+      "name": "Run npm start",
+      "request": "launch", 
+      "type": "node-terminal"
+    }
+  ]
+ }

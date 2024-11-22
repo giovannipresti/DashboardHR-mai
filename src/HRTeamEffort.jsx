@@ -72,20 +72,37 @@ const HRTeamEffort = () => {
     return totals;
   };
 
-  const calculateRecruitingCapacity = () => {
-    let totalCapacity = 0;
+  const calculateRecruitingMetrics = () => {
+    // Calculate current recruiting FTE
+    const recruitingFTE = teamMembers.reduce((total, member) => {
+      const memberRecruitingFTE = member.activities
+        .filter(activity => activity.category === "Recruiting")
+        .reduce((sum, activity) => sum + activity.fte, 0);
+      return total + memberRecruitingFTE;
+    }, 0);
+
+    // Calculate current recruiting capacity
+    let currentCapacity = 0;
     teamMembers.forEach((member) => {
       if (member.recruitingCapacity) {
-        totalCapacity +=
-          member.recruitingCapacity.positions ||
-          member.recruitingCapacity.seniorPositions;
+        currentCapacity += member.recruitingCapacity.positions || member.recruitingCapacity.seniorPositions || 0;
       }
     });
-    return totalCapacity;
+
+    // Calculate gap percentage
+    const requiredCapacity = organizationData.recruitingNeeds.total;
+    const gap = ((currentCapacity - requiredCapacity) / requiredCapacity * 100).toFixed(0);
+
+    return {
+      currentFTE: recruitingFTE.toFixed(1),
+      currentCapacity,
+      requiredCapacity,
+      gap: `${gap}%`
+    };
   };
 
   const categoryTotals = calculateCategoryTotals();
-  const currentRecruitingCapacity = calculateRecruitingCapacity();
+  const recruitingMetrics = calculateRecruitingMetrics();
 
   return (
     <div className="w-full space-y-6 p-6 bg-gray-50">
@@ -110,28 +127,24 @@ const HRTeamEffort = () => {
         <Card className="bg-blue-50">
           <div className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-medium">Recruiting Capacity</h3>
+              <h3 className="font-medium">Recruiting & Talent Acquisition</h3>
               <AlertTriangle
                 className={
-                  currentRecruitingCapacity <
-                  organizationData.recruitingNeeds.total
+                  recruitingMetrics.currentCapacity < recruitingMetrics.requiredCapacity
                     ? "text-red-500"
                     : "text-green-500"
                 }
               />
             </div>
             <div className="space-y-1 text-sm">
-              <p>Current: {currentRecruitingCapacity} positions/year</p>
-              <p>
-                Required: {organizationData.recruitingNeeds.total}{" "}
-                positions/year
-              </p>
-              <p className="text-red-600">
-                Gap:{" "}
-                {currentRecruitingCapacity -
-                  organizationData.recruitingNeeds.total}{" "}
-                positions
-              </p>
+              <p>Current: {recruitingMetrics.currentFTE} FTE</p>
+              <p>Required: {(recruitingMetrics.requiredCapacity / 45).toFixed(1)} FTE</p>
+              <p className="text-red-600">Gap: {recruitingMetrics.gap}</p>
+              <div className="mt-2 pt-2 border-t border-gray-200">
+                <p>Posizioni/Anno</p>
+                <p>Capacità Attuale: {recruitingMetrics.currentCapacity}</p>
+                <p>Gap: {recruitingMetrics.gap}</p>
+              </div>
             </div>
           </div>
         </Card>
