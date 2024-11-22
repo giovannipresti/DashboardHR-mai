@@ -1,35 +1,20 @@
 {
-  "setupTasks": [
-    {
-      "name": "Kill process on port 3000",
-      "command": "lsof -ti:3000 | xargs kill -9 || true" 
-    },
-    {
-      "name": "Install Dependencies", 
-      "command": "npm install"
-    }
-  ],
-  "tasks": {
-    "start": {
-      "name": "start",
-      "command": "lsof -ti:3000 | xargs kill -9 || true && npm start",
-      "runAtStart": true,
-      "preview": {
-        "port": 3000
-      }
-    },
-    "build": {
-      "name": "build",
-      "command": "npm run build",
-      "runAtStart": false
-    }
-  },
+  "version": "0.2.0",
   "configurations": [
+    
     {
-      "command": "npm start",
-      "name": "Run npm start",
-      "request": "launch", 
-      "type": "node-terminal"
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Development Server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "preLaunchTask": "Setup Project",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "env": {
+        "BROWSER": "none"
+      }
     }
   ]
- }
+}

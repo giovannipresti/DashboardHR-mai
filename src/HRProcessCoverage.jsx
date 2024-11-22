@@ -1,31 +1,22 @@
-// HRProcessCoverage.jsx
-import React, { useState } from 'react';
-import { Calculator, Settings, AlertTriangle } from 'lucide-react';
-import DetailModal from './DetailModal';
-import ProcessDetail from './ProcessDetail';
-import { useProcessConfig } from './ProcessConfigContext';
-import { calculateRecruitingFTE } from './recruitingProcess';
-import { calculateTrainingFTE } from './trainingProcess';
-import { calculatePerformanceFTE } from './performanceProcess';
-import { calculateAdminFTE } from './adminProcess';
+// src/HRProcessCoverage.jsx
+import React, { useState } from "react";
+import { Calculator, Settings } from "lucide-react";
+import DetailModal from "./DetailModal";
+import ProcessCoverageIndicator from './ProcessCoverageIndicator';
+import { calculateRecruitingFTE } from "./recruitingProcess";
+import { calculateTrainingFTE } from "./trainingProcess";
+import { calculatePerformanceFTE } from "./performanceProcess";
+import { calculateAdminFTE } from "./adminProcess";
 
 const ProcessCard = ({ process, onClick, onConfigClick }) => (
   <div className="bg-white rounded-lg shadow p-6">
     <div className="flex justify-between items-center mb-4">
-      <div className="flex items-center space-x-2">
-        <h3 className="text-lg font-medium">{process.name}</h3>
-        {process.gap < -20 && (
-          <AlertTriangle className="w-4 h-4 text-amber-500" />
-        )}
-      </div>
-      <button 
-        onClick={() => onConfigClick(process)}
-        className="p-2 hover:bg-gray-100 rounded-full"
-      >
+      <h3 className="text-lg font-medium">{process.name}</h3>
+      <button onClick={() => onConfigClick(process)} className="p-2 hover:bg-gray-100 rounded-full">
         <Settings className="w-5 h-5 text-gray-600" />
       </button>
     </div>
-
+    
     <div className="grid grid-cols-3 gap-4">
       {process.metrics.map((metric, idx) => (
         <div key={idx} className="bg-gray-50 p-3 rounded">
@@ -35,15 +26,15 @@ const ProcessCard = ({ process, onClick, onConfigClick }) => (
       ))}
     </div>
 
-    <div className="mt-4 flex justify-between items-center">
-      <div className="text-sm">
-        <span className="text-gray-600">Current: </span>
-        <span className="font-medium">{process.current} FTE</span>
-      </div>
-      <div className="text-sm">
-        <span className="text-gray-600">Required: </span>
-        <span className="font-medium">{process.required.toFixed(2)} FTE</span>
-      </div>
+    <div className="mt-4">
+      <ProcessCoverageIndicator 
+        name="Process Coverage"
+        current={process.current}
+        required={process.required}
+      />
+    </div>
+
+    <div className="mt-4 flex justify-end">
       <button
         onClick={() => onClick(process)}
         className="text-sm text-blue-600 hover:text-blue-800"
@@ -54,11 +45,50 @@ const ProcessCard = ({ process, onClick, onConfigClick }) => (
   </div>
 );
 
+const ProcessDetail = ({ process }) => (
+  <div className="bg-white rounded-lg p-6">
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-4">
+        {process.phases?.map((phase, idx) => (
+          <div key={idx} className="bg-gray-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center mb-2">
+              <div className="font-medium text-gray-900">{phase.label}</div>
+              <div className="text-sm text-blue-600">{phase.hours}h</div>
+            </div>
+            <p className="text-sm text-gray-600">{phase.details}</p>
+            {phase.subMetrics && (
+              <div className="mt-2">
+                {phase.subMetrics.map((metric, midx) => (
+                  <div key={midx} className="text-xs text-gray-500 mt-1">
+                    • {metric}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-blue-50 p-4 rounded-lg">
+        <h4 className="font-medium mb-2">Calculation Details:</h4>
+        <pre className="text-sm text-gray-600 whitespace-pre-wrap">
+          {process.calculation}
+        </pre>
+      </div>
+    </div>
+  </div>
+);
+
 const HRProcessCoverage = ({ staffingData }) => {
   const [selectedProcess, setSelectedProcess] = useState(null);
   const [configProcess, setConfigProcess] = useState(null);
-  const { configs, updateConfig } = useProcessConfig();
-  
+  const [configs, setConfigs] = useState({
+    recruiting: {},
+    training: {},
+    performance: {},
+    admin: {}
+  });
+
   const getProcesses = () => {
     const headcount = staffingData.totalEmployees;
     
@@ -76,8 +106,7 @@ const HRProcessCoverage = ({ staffingData }) => {
         phases: recruiting.phases,
         calculation: recruiting.calculation,
         config: configs.recruiting,
-        processKey: 'recruiting',
-        gap: ((1.8 - recruiting.requiredFTE) / recruiting.requiredFTE) * 100
+        processKey: 'recruiting'
       },
       {
         name: "Training & Development",
@@ -87,8 +116,7 @@ const HRProcessCoverage = ({ staffingData }) => {
         phases: training.phases,
         calculation: training.calculation,
         config: configs.training,
-        processKey: 'training',
-        gap: ((0.8 - training.requiredFTE) / training.requiredFTE) * 100
+        processKey: 'training'
       },
       {
         name: "Performance Management",
@@ -98,8 +126,7 @@ const HRProcessCoverage = ({ staffingData }) => {
         phases: performance.phases,
         calculation: performance.calculation,
         config: configs.performance,
-        processKey: 'performance',
-        gap: ((1.0 - performance.requiredFTE) / performance.requiredFTE) * 100
+        processKey: 'performance'
       },
       {
         name: "HR Admin & Operations",
@@ -109,32 +136,29 @@ const HRProcessCoverage = ({ staffingData }) => {
         phases: admin.phases,
         calculation: admin.calculation,
         config: configs.admin,
-        processKey: 'admin',
-        gap: ((2.0 - admin.requiredFTE) / admin.requiredFTE) * 100
+        processKey: 'admin'
       }
     ];
   };
 
   const processes = getProcesses();
-  const totalRequired = processes.reduce((acc, p) => acc + p.required, 0);
-  const totalCurrent = processes.reduce((acc, p) => acc + p.current, 0);
-  const totalGap = ((totalCurrent - totalRequired) / totalRequired) * 100;
+
+  const handleConfigUpdate = (processKey, newConfig) => {
+    setConfigs(prev => ({
+      ...prev,
+      [processKey]: { ...prev[processKey], ...newConfig }
+    }));
+  };
 
   return (
     <div className="p-6 bg-gray-100">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">Process Coverage Analysis</h2>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
           <Calculator className="w-5 h-5 text-blue-600" />
-          <div className="text-sm text-gray-600">
-            <span>Current: {totalCurrent.toFixed(1)} FTE</span>
-            <span className="mx-2">|</span>
-            <span>Required: {totalRequired.toFixed(1)} FTE</span>
-            <span className="mx-2">|</span>
-            <span className={totalGap < -20 ? "text-red-600" : "text-gray-600"}>
-              Gap: {totalGap.toFixed(0)}%
-            </span>
-          </div>
+          <span className="text-sm text-gray-600">
+            Total Required: {processes.reduce((acc, p) => acc + p.required, 0).toFixed(1)} FTE
+          </span>
         </div>
       </div>
 
@@ -173,7 +197,7 @@ const HRProcessCoverage = ({ staffingData }) => {
           process={configProcess}
           onClose={() => setConfigProcess(null)}
           onUpdateConfig={(newConfig) => {
-            updateConfig(configProcess.processKey, newConfig);
+            handleConfigUpdate(configProcess.processKey, newConfig);
             setConfigProcess(null);
           }}
         />
